@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+  display: block;
+  margin: auto;
+  width: 1400px;
+}
+
+.tab {
+  margin-right: 100px;
+  margin-left: 100px;
+  font-size: 16px;
+}
