@@ -7,8 +7,10 @@ import ForgotPassword from "./User/ForgotPassword";
 import SignUp from "./User/SignUp";
 import Analytics from "./Analytics/Analytics";
 import Marketplace from "./Marketplace/Marketplace";
-import Summary from "./Summary/Summary";
+import Model from "./Models/Model"
+import Summary from "./Summary/Summary"
 import HomePage from "./HomePage";
+import User from "./User/User";
 
 class App extends Component {
     render() {
@@ -29,16 +31,17 @@ class App extends Component {
                             <NavBar/>
                             <HomePage/>
                         </Route>
-                        <Route path="/summary">
-                        <NavBar/>
-                        <Summary/>
-                        </Route>
                         <Route path="/marketplace">
                             <NavBar/>
                             <Marketplace/>
                         </Route>
+                        <Route path="/summary">
+                            <NavBar/>
+                            <Summary/>
+                        </Route>
                         <Route path="/models">
                             <NavBar/>
+                        <Model/>
                         </Route>
                         <Route path="/analytics">
                             <NavBar/>
@@ -46,6 +49,7 @@ class App extends Component {
                         </Route>
                         <Route path="/user">
                             <NavBar/>
+                            <User/>
                         </Route>
                     </Switch>
                 </main>

@@ -1,25 +1,19 @@
 import React, {Component} from 'react';
-import axios from "axios"
-import {Dropdown, Nav} from 'react-bootstrap';
-import './mm.css'
-import {Redirect} from "react-router-dom";
-import Select from 'react-select'
+import {Table, Button, Form} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from "axios";
+import BootstrapTable from "react-bootstrap-table-next";
+import paginationFactory from "react-bootstrap-table2-paginator";
 
 class Marketplace extends Component {
-
     constructor(props) {
         super(props)
         this.state = {
             isLoading: true,
             data: [],
-            SelectedItems: []
+            selectedItems: []
         }
     }
-    options = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
-    ]
 
     setData(e) {
         this.setState({data: e})
@@ -28,7 +22,7 @@ class Marketplace extends Component {
     componentDidMount = async () => {
         try {
             this.state.isLoading = false
-            let options = this.getRequestOptions("get", "http://localhost:4000/analytics/getSp500")
+            let options = this.getRequestOptions("get", "http://localhost:4000/analytics/getRealTimeGates")
             let res = await this.doRequest(options)
             this.setData(res.data)
             console.log(res.data)
@@ -44,12 +38,8 @@ class Marketplace extends Component {
         }
     }
 
-
-    onClickHandler = event => {
-        const value = event.target.innerHTML;
-        this.setState({
-            SelectedItems: this.state.SelectedItems.concat([value])
-        })
+    doRequest = async (options) => {
+        return axios(options);
     }
 
     getRequestOptions = (method, url, data) => {
@@ -60,14 +50,14 @@ class Marketplace extends Component {
         }
     }
 
-    signUpHandler = async (event) => {
+    submitHandler = async (event) => {
         event.preventDefault();
         try {
             let body = {
                 "email": sessionStorage.getItem('email'),
-                "stocks": this.state.SelectedItems
+                "stocks": this.state.selectedItems
             }
-            let options = this.getRequestOptions("post", "http://localhost:5000/user/add", body)
+            let options = this.getRequestOptions("post", "http://localhost:5000/marketplace/addStocks", body)
             let res = await this.doRequest(options)
             alert("Your file is being uploaded!")
         } catch (e) {
@@ -76,55 +66,82 @@ class Marketplace extends Component {
 
     }
 
-    doRequest = async (options) => {
-        return axios(options);
+    handleChecked = (row, isSelected) => {
+        if (isSelected) {
+            this.setState({
+                selectedItems: this.state.selectedItems.concat([row])
+            })
+        } else {
+            this.setState(({selectedItems}) => ({
+                selectedItems: selectedItems.filter((element) => (row.id !== element.id))
+            }));
+        }
     }
 
+
     render() {
-        if(!sessionStorage.getItem("email"))
-            return <Redirect to={"/login"} />
         if (this.state.isLoading) {
             return <p>Loading ...</p>;
         }
+        const selectRowProp = {
+            mode: 'checkbox',
+            bgColor: '#D3D3D3',
+            onSelect: (row, isSelect) => {
+                this.handleChecked(row, isSelect)
+                console.log(this.state.selectedItems)
+            }
+        }
+        const columns = [
+            {
+                dataField: 'symbol',
+                text: 'Symbol',
+                sort: true,
+            }, {
+                dataField: 'name',
+                text: 'Name',
+                sort: true
+            }
+            , {
+                dataField: 'close',
+                text: 'Gate',
+                sort: true
+            },
+            {
+                dataField: 'daily_change_percent',
+                text: 'DCP',
+                sort: true
+            },
+            {
+                dataField: 'daily_change_value',
+                text: 'DCV',
+                sort: true
+            },
+        ];
         return (
-            <div className="dropdown">
+            <div>
                 <hr></hr>
                 <h1>Select stocks which you want to buy</h1>
                 <hr></hr>
-                <Nav fill variant="tabs" defaultActiveKey="/home">
-                    <Nav.Item>
-                        <Nav.Link href="/home">Active</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="link-1">Loooonger NavLink</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="link-2">Link</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="disabled" disabled>
-                            Disabled
-                        </Nav.Link>
-                    </Nav.Item>
-                </Nav>
-                <Dropdown>
-                    <div id="left">
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                        Select Stocks
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        {this.state.data.map(size => (
-                            <Dropdown.Item onClick={(e) => this.onClickHandler(e)}>{size.name}</Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>
-                    </div>
-                </Dropdown>
-                <div style={{marginTop : '100px', display : "inline-block"}}>
-                <Select options={this.options} />
-                </div>
+                <BootstrapTable
+                    keyField='symbol'
+                    data={this.state.data}
+                    columns={columns}
+                    selectRow={selectRowProp}
+                    striped
+                    pagination={paginationFactory({
+                        page: 1,
+                        sizePerPage: 10,
+                        hideSizePerPage: true
+                    })}
+                />
+                <Form onSubmit={this.submitHandler}>
+                    <Button variant="primary" type="submit">
+                        Submit
+                    </Button>
+                </Form>
             </div>
-        );
+        )
     }
 }
 
-export default <Marketplace></Marketplace>
+export default Marketplace

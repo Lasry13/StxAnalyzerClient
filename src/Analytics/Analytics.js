@@ -8,7 +8,7 @@ class Analytics extends Component {
         super(props)
         this.state = {
             isLoading: true,
-            data: []
+            data: [],
         }
     }
 
@@ -35,15 +35,16 @@ class Analytics extends Component {
         }
     }
 
-    getRequestOptions = (method, url) => {
+    doRequest = async (options) => {
+        return axios(options);
+    }
+
+    getRequestOptions = (method, url, data) => {
         return {
             method: method,
             url: url,
+            data: data
         }
-    }
-
-    doRequest = async (options) => {
-        return axios(options);
     }
 
     render() {
@@ -70,7 +71,7 @@ class Analytics extends Component {
                     <tbody>
                     {
                         this.state.data.map((key) =>
-                            <tr>
+                            <tr key={key.id}>
                                 <td>{key.symbol}</td>
                                 <td>{key.name}</td>
                                 <td>{key.sector}</td>
@@ -79,7 +80,9 @@ class Analytics extends Component {
                                 <td>{key.low}</td>
                                 <td>{key.close}</td>
                                 <td>{key.volume}</td>
-                                <td>{key.daily_change_percent + '%'}</td>
+                                <td style={{
+                                    color: key.daily_change_percent <= 0 ? '#e72020' : '#2cbb0a'
+                                }}>{key.daily_change_percent + '%'}</td>
                                 <td>{key.daily_change_value}</td>
                             </tr>
                         )}
