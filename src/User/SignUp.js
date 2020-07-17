@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import axios from "axios";
-import './SignUp.css'
-import {Redirect} from "react-router-dom";
+import {Button, Form} from "react-bootstrap";
 
 class SignUp extends Component {
     constructor(props) {
@@ -13,8 +12,7 @@ class SignUp extends Component {
             password: "",
             budget: null,
             country: "",
-            valid: "",
-            redirect: null
+            validationMessage: "",
         };
     }
 
@@ -38,17 +36,10 @@ class SignUp extends Component {
         this.setState({budget: e.target.value})
     }
 
-    setCountry(e) {
-        this.setState({country: e.target.value})
+    setValid(message) {
+        this.setState({valid: message})
     }
 
-    setValid(e) {
-        this.setState({valid: e})
-    }
-
-    setRedirect(e) {
-        this.setState({redirect: e})
-    }
 
     validateName = (name) => {
         return name.length > 0
@@ -118,7 +109,6 @@ class SignUp extends Component {
                 let options = this.getRequestOptions("post", "http://localhost:5000/user/signUp", body)
                 let res = await this.doRequest(options)
                 console.log(res.data)
-                this.setRedirect("/summary")
             } catch (e) {
                 if (e.response) {
                     let message;
@@ -136,50 +126,38 @@ class SignUp extends Component {
     }
 
     render() {
-        if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
-        }
         return (
-            <div>
+            <div style={{
+                display: 'block',
+                margin: 'auto',
+                width: '30%',
+                height: '50%',
+                border: '1px solid #eee'
+            }}>
                 <h1>Sign Up</h1>
-                <div className="Person">
+                <Form onSubmit={this.signInHandler}>
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control type="email" placeholder="Enter email" onChange={e => this.setEmail(e)}/>
+                        <Form.Text className="text-muted">
+
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group controlId="formBasicPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control type="password"  placeholder="Password" onChange={e => this.setPassword(e)}/>
+                    </Form.Group>
                     <div>
-                        <input type="text"
-                               placeholder="First Name"
-                               onChange={e => this.setFirstName(e)}/>
+                        <p>{this.state.valid}</p>
                     </div>
-                    <div>
-                        <input type="text"
-                               placeholder="Last Name"
-                               onChange={e => this.setLastName(e)}/>
-                    </div>
-                    <div>
-                        <input type="text"
-                               placeholder="Email"
-                               onChange={e => this.setEmail(e)}/>
-                    </div>
-                    <div>
-                        <input type="text"
-                               placeholder="Password"
-                               onChange={e => this.setPassword(e)}/>
-                    </div>
-                    <div>
-                        <input type="text"
-                               placeholder="Budget"
-                               onChange={e => this.setBudget(e)}/>
-                    </div>
-                    <div>
-                        <input type="text"
-                               placeholder="Country"
-                               onChange={e => this.setCountry(e)}/>
-                    </div>
-                    <p style={{paddingTop: "4px"}}>{this.state.valid}</p>
-                    <div>
-                        <form onSubmit={this.signUpHandler}>
-                            <button className="button">Join</button>
-                        </form>
-                    </div>
-                </div>
+                    <Form.Group controlId="formBasicCheckbox">
+                        <Form.Check type="checkbox" label="Check me out"/>
+                    </Form.Group>
+                    <Button variant="primary" type="submit">
+                        Submit
+                    </Button>
+                </Form>
             </div>
         )
     }

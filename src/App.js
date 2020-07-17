@@ -8,9 +8,9 @@ import SignUp from "./User/SignUp";
 import Analytics from "./Analytics/Analytics";
 import Marketplace from "./Marketplace/Marketplace";
 import Model from "./Models/Model"
-import Summary from "./Summary/Summary"
 import HomePage from "./HomePage";
 import User from "./User/User";
+import Summary from "./Summary/Summary";
 
 class App extends Component {
     render() {
